@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<MasterDetailPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DietCreator"
+             x:Class="DietCreator.MainPage">
+
+    <MasterDetailPage.Master>
+        <ContentPage Title="Добро пожаловать!">
+            <ContentPage.Content>
+                <StackLayout>
+                    <Button x:Name="CreateDiet" Text="Составить диету" 
+                            HorizontalOptions="FillAndExpand" Clicked="CreateDiet_Click"></Button>
+                    <Button x:Name="Calculator" Text="Калькулятор калорий"  
+                            HorizontalOptions="FillAndExpand" Clicked="Calculator_Click"></Button>
+                    <Button x:Name="SearchService" Text="Справочник продуктов"
+                            HorizontalOptions="FillAndExpand" Clicked="SearchService_Click"></Button>
+                    <Button x:Name="AboutProgram" Text="О программе"
+                            HorizontalOptions="FillAndExpand" Clicked="AboutProgram_Click"></Button>
+                    <Button x:Name="Settings" Text="Настройки"
+                            HorizontalOptions="FillAndExpand" Clicked="Settings_Click"></Button>
+                </StackLayout>
+            </ContentPage.Content>
+        </ContentPage>
+    </MasterDetailPage.Master>
+
+</MasterDetailPage>

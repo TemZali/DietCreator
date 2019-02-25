@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DietCreator.FoodPickPage"
+             Title="{Binding TypeTitle}">
+    <ContentPage.Content>
+        <StackLayout>
+            <ListView ItemsSource="{Binding FoodList}"
+                  HasUnevenRows="True"
+                      x:Name="PickListView"
+                      ItemTapped="Pick">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <StackLayout  BackgroundColor="{Binding FoodColor}" >
+                                    <Label HeightRequest="50" TextColor="Black" FontSize="Large"
+                                           Text="{Binding Name}" HorizontalOptions="CenterAndExpand"/>
+                                </StackLayout>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button BackgroundColor="Yellow" Text="Подтвердить выбор" Clicked="PickMade_Click"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

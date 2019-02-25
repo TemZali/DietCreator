@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DietCreator.GeneralChoice"
+             Title="Выберите категорию продуктов">
+    <ContentPage.Content>
+        <StackLayout>
+            <ListView ItemsSource="{Binding TypesOfFoodList}"
+                  HasUnevenRows="True"
+                      ItemTapped="TypePick"
+                      x:Name="TypesListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <StackLayout BackgroundColor="{Binding TypeColor}" x:Name="ListLayout" HorizontalOptions="FillAndExpand" >
+                                    <Label Text="{Binding Name}" TextColor="Black" HeightRequest="50"  FontSize="Large" HorizontalOptions="Center"/>
+                                </StackLayout>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button VerticalOptions="FillAndExpand" BackgroundColor="Yellow" Text="Диета для сохранения веса" Clicked="CreateSave_Click"/>
+            <Button VerticalOptions="FillAndExpand" BackgroundColor="Yellow" Text="Диета для похудения" Clicked="CreateLose_Click"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
