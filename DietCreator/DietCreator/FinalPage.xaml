@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DietCreator.FinalPage"
+            Title="Диета на 7 дней">
+    <ContentPage.Content>
+        <StackLayout>
+            <ScrollView>
+                <StackLayout x:Name="FinalLayout" Spacing="0" Padding="0">
+                </StackLayout>
+            </ScrollView>
+            <Button Text="Вернуться на главную страницу" Clicked="EndClick"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

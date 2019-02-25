@@ -1,0 +1,6 @@
+.vs
+**/DietCreator.Android
+**/DietCreator.iOS
+**/DietCreator.UWP
+**/bin
+**/obj

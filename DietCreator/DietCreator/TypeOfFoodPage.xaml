@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DietCreator.TypeOfFoodPage"
+             Title="{Binding TypeTitle}">
+
+    <ContentPage.Content>
+        <ListView ItemsSource="{Binding FoodList}"
+                  HasUnevenRows="True"
+                  ItemTapped="FoodChoice_Click">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <ViewCell.View>
+                            <StackLayout BackgroundColor="#FFFACD" >
+                                <Label Text="{Binding Name}" FontSize="Large" TextColor="Black" HeightRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </StackLayout>
+                        </ViewCell.View>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ContentPage.Content>
+</ContentPage>
