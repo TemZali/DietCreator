@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DietCreator.CalculatorPage"
+             Title="Калькулятор калорий">
+    <ContentPage.Content>
+        <StackLayout Padding="12,12,12,12">
+            <Entry x:Name="Weight" Placeholder="Введите ваш вес(в кг)" Keyboard="Numeric"></Entry>
+            <Entry x:Name="Age" Placeholder="Введите ваш возраст(в годах)" Keyboard="Numeric"></Entry>
+            <Entry x:Name="High" Placeholder="Введите ваш рост(в см)" Keyboard="Numeric"></Entry>
+            <Picker Title="Выберите пол" x:Name="Picker1">
+                <Picker.Items>
+                    <x:String>Мужской</x:String>
+                    <x:String>Женский</x:String>
+                </Picker.Items>
+            </Picker>
+            <StackLayout Orientation="Horizontal">
+                <Stepper x:Name="ActivityStepper" HorizontalOptions="Start" Increment="0.1" 
+                         Minimum="1.0" Maximum="2.0" Value="1.0" ValueChanged="StepActivity" ></Stepper>
+                <Label x:Name="ActivityCoefficientInfo" Text="Коэффициент активности равен:1.0" VerticalOptions="FillAndExpand"></Label>
+            </StackLayout>
+            <Label x:Name="ActivityInfo" Text="Минимальный уровень физической нагрузки или
+                   полное ее отсутствие (сидячая работа, отсутствие спорта)." FontAttributes="Italic"></Label>
+            <Button Text="Рассчитать ежедневный расход калорий" FontSize="Large" VerticalOptions="FillAndExpand" Clicked="Calculate_Click"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
