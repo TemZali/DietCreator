@@ -6,23 +6,28 @@
     <ContentPage.Content>
         <StackLayout>
             <ListView ItemsSource="{Binding FoodList}"
+                  x:Name="PickListView"
                   HasUnevenRows="True"
-                      x:Name="PickListView"
-                      ItemTapped="Pick">
+                  ItemTapped="Pick">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <ViewCell.View>
-                                <StackLayout  BackgroundColor="{Binding FoodColor}" >
-                                    <Label HeightRequest="50" TextColor="Black" FontSize="Large"
-                                           Text="{Binding Name}" HorizontalOptions="CenterAndExpand"/>
+                                <StackLayout Margin="8">
+                                    <StackLayout Orientation="Horizontal">
+                                        <StackLayout>
+                                            <Label Text="{Binding FoodName}" TextColor="Black" FontSize="Medium"/>
+                                            <Label Text="{Binding CPFCString,StringFormat='КБЖУ на 100г: {0}'}"/>
+                                        </StackLayout>
+                                        <Image Source="CheckImage.png" HeightRequest="40" HorizontalOptions="EndAndExpand" IsVisible="{Binding IsPicked}"/>
+                                    </StackLayout>
                                 </StackLayout>
                             </ViewCell.View>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Button BackgroundColor="Yellow" Text="Подтвердить выбор" Clicked="PickMade_Click"/>
+            <Button HorizontalOptions="FillAndExpand" CornerRadius="5" BackgroundColor="#5c6bc0" TextColor="White" Text="Подтвердить выбор" Clicked="PickMade_Click"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

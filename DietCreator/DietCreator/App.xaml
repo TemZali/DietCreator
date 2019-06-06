@@ -14,8 +14,8 @@
                 <Setter Property="Spacing" Value="0"/>
             </Style>
             <Style TargetType="NavigationPage">
-                <Setter Property="BarBackgroundColor" Value="#FFFF55"/>
-                <Setter Property="BarTextColor" Value="#696969"/>
+                <Setter Property="BarBackgroundColor" Value="#5c6bc0"/>
+                <Setter Property="BarTextColor" Value="White"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

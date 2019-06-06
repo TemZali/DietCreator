@@ -18,7 +18,7 @@ namespace DietCreator
 
         public FoodPickPage(TypeOfFood type)
         {
-            TypeTitle = type.Name;
+            TypeTitle = type.TypeName;
             FoodList = type.ListOfFood;
 
             InitializeComponent();
@@ -30,13 +30,11 @@ namespace DietCreator
         {
             if (((Food)((ItemTappedEventArgs)e).Item).IsPicked)
             {
-                ((Food)((ItemTappedEventArgs)e).Item).FoodColor = Color.FromHex("#FFFACD");
                 ((Food)((ItemTappedEventArgs)e).Item).IsPicked = false;
             }
             else
             {
                 ((Food)((ItemTappedEventArgs)e).Item).IsPicked = true;
-                ((Food)((ItemTappedEventArgs)e).Item).FoodColor = Color.Green;
             }
             PickListView.ItemsSource = null;
             PickListView.ItemsSource = FoodList;

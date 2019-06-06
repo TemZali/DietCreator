@@ -2,11 +2,38 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DietCreator.StartPage"
-             Title="Добро пожаловать!">
+             Title="Добро пожаловать!"
+             BackgroundColor="#e1e2e1">
     <ContentPage.Content>
-        <StackLayout>
-            <Button HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" 
-                    BackgroundColor="White" Text="Составить диету" FontSize="Large"  Clicked="CreateDiet_Click"/>
+        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Label Margin="8" TextColor="Black" Text="Интересные ссылки" FontSize="Medium"/>
+            <ListView x:Name="LinkList"
+                HasUnevenRows="True"
+                ItemsSource="{Binding LinkItems}"
+                SeparatorVisibility="None"
+                ItemTapped="LinkClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Frame CornerRadius="5" Padding="8" HeightRequest="80" Margin="8">
+                                    <StackLayout Orientation="Horizontal" BackgroundColor="White" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Spacing="8" >
+                                        <Image Source="{Binding Icon}" HeightRequest="64"/>
+                                        <StackLayout HorizontalOptions="FillAndExpand">
+                                            <Label TextColor="Black" Text="{Binding Name}" 
+                                                   LineBreakMode="TailTruncation" MaxLines="2" FontSize="Medium"
+                                                   VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
+                                            <Button Text="Перейти" FontFamily="{Binding Link}" TextColor="Black" Clicked="NewsClick" CornerRadius="5"
+                                                    BackgroundColor="White" HorizontalOptions="End" />
+                                        </StackLayout>
+                                    </StackLayout>
+                                </Frame>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

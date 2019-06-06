@@ -18,7 +18,7 @@ namespace DietCreator
 
         public TypeOfFoodPage(TypeOfFood type)
         {
-            TypeTitle = type.Name;
+            TypeTitle = type.TypeName;
             FoodList = new List<Food>();
             for (int i = 0; i < type.ListOfFood.Count; i++)
             {
@@ -29,9 +29,9 @@ namespace DietCreator
 
         }
 
-        private async void FoodChoice_Click(object sender, EventArgs e)
+        private void FoodChoice_Click(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new FoodPage((Food)((ItemTappedEventArgs)e).Item));
+            TypeListView.SelectedItem = null;
         }
     }
 }

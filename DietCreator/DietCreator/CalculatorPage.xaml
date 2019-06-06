@@ -2,26 +2,78 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DietCreator.CalculatorPage"
-             Title="Калькулятор калорий">
+             Title="Калькулятор калорий"
+             BackgroundColor="#e1e2e1">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontSize" Value="Medium"/>
+                <Setter Property="Margin" Value="8,8,0,8"/>
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontSize" Value="Medium"/>
+                <Setter Property="MaxLength" Value="3"/>
+                <Setter Property="Keyboard" Value="Numeric"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+            </Style>
+            <Style TargetType="Picker">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontSize" Value="Medium"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
-        <StackLayout Padding="12,12,12,12">
-            <Entry x:Name="Weight" Placeholder="Введите ваш вес(в кг)" Keyboard="Numeric"></Entry>
-            <Entry x:Name="Age" Placeholder="Введите ваш возраст(в годах)" Keyboard="Numeric"></Entry>
-            <Entry x:Name="High" Placeholder="Введите ваш рост(в см)" Keyboard="Numeric"></Entry>
-            <Picker Title="Выберите пол" x:Name="Picker1">
-                <Picker.Items>
-                    <x:String>Мужской</x:String>
-                    <x:String>Женский</x:String>
-                </Picker.Items>
-            </Picker>
-            <StackLayout Orientation="Horizontal">
-                <Stepper x:Name="ActivityStepper" HorizontalOptions="Start" Increment="0.1" 
-                         Minimum="1.0" Maximum="2.0" Value="1.0" ValueChanged="StepActivity" ></Stepper>
-                <Label x:Name="ActivityCoefficientInfo" Text="Коэффициент активности равен:1.0" VerticalOptions="FillAndExpand"></Label>
+        <ScrollView>
+            <StackLayout>
+                <Frame CornerRadius="8" Margin="16">
+                    <StackLayout  BackgroundColor="White">
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Вес(в кг):"/>
+                            <Entry x:Name="Weight"/>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Рост(в см):"/>
+                            <Entry x:Name="High"/>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Возраст:"/>
+                            <Entry x:Name="Age" Keyboard="Numeric"/>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Выберите пол:"/>
+                            <Picker x:Name="Picker1" Margin="8,0">
+                                <Picker.Items>
+                                    <x:String>Мужской</x:String>
+                                    <x:String>Женский</x:String>
+                                </Picker.Items>
+                            </Picker>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" Margin="8,8,0,8">
+                            <StackLayout>
+                                <Label Margin="0" Text="Активность:"/>
+                                <Label Margin="0" Text="от 1.0 до 2.0" TextColor="Default" FontSize="Default"/>
+                            </StackLayout>
+                            <Entry MaxLength="5" x:Name="ActivityCoefficientInfo" Unfocused="ActivityValueChanged"/>
+                        </StackLayout>
+                        <Label x:Name="ActivityInfo" TextColor="Default" FontSize="Default" 
+                               Text="Минимальный уровень физической нагрузки или полное ее отсутствие (сидячая работа, отсутствие спорта)."
+                               FontAttributes="Italic"/>
+                        <Button Text="Пуск" 
+                                BackgroundColor="#5c6bc0" CornerRadius="8" TextColor="White" HorizontalOptions="End"
+                                VerticalOptions="EndAndExpand" HeightRequest="48" Clicked="Calculate_Click"/>
+                    </StackLayout>
+                </Frame>
+                <Frame CornerRadius="8" Margin="16,0,16,16" >
+                    <StackLayout BackgroundColor="White">
+                        <Label x:Name="SaveTitle" HorizontalOptions="Center"/>
+                        <Label x:Name="SaveCallories"/>
+                        <Label x:Name="SavePFC"/>
+                    </StackLayout>
+                </Frame>
             </StackLayout>
-            <Label x:Name="ActivityInfo" Text="Минимальный уровень физической нагрузки или
-                   полное ее отсутствие (сидячая работа, отсутствие спорта)." FontAttributes="Italic"></Label>
-            <Button Text="Рассчитать ежедневный расход калорий" FontSize="Large" VerticalOptions="FillAndExpand" Clicked="Calculate_Click"/>
-        </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

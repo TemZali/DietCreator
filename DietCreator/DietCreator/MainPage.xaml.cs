@@ -11,76 +11,352 @@ namespace DietCreator
 {
     public partial class MainPage : MasterDetailPage
     {
+
         public List<TypeOfFood> ListOfTypes { get; set; }
 
-        public HttpClient client { get; set; }
+        public List<FoodLibrary.MenuItem> MenuItems { get; set; }
 
         public MainPage()
         {
+            
+            List<Food> foods = App.FoodTable.GetItems();
+            if (foods.Count < 10)
+            {
+                CreateDatabase();
+                foods = App.FoodTable.GetItems();
+            }
+            ListOfTypes = App.TypeOfFoodTable.GetItems();
+            foreach (Food food in foods)
+            {
+                food.CPFCString = $"{food.Callories}/{food.Protein:f1}/{food.Fat:f1}/{food.Carbohydrate:f1}";
+                ListOfTypes[food.TypeId - 1].ListOfFood.Add(food);
+            }
+            ToolbarItem home = new ToolbarItem()
+            {
+                Icon = "HomeIcon.png",
+                Text = "home"
+            };
+            home.Clicked += (sender, e) =>
+            {
+                Detail = new NavigationPage(new StartPage(ListOfTypes));
+            };
+            ToolbarItems.Add(home);
             InitializeComponent();
-
-            client = new HttpClient();
-
-            client.BaseAddress = new Uri("https://fooddietapi.azurewebsites.net");
-
-            client.DefaultRequestHeaders.Accept.Clear();
-
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var stop = Task.Run(GetInfo);
-
-            stop.Wait();
+            MenuItems = new List<FoodLibrary.MenuItem>()
+            {
+                new FoodLibrary.MenuItem(){Icon="CreateDietImage.jpg",Name="Составить диету" },
+                new FoodLibrary.MenuItem("CalculatorImage.jpg","Калькулятор калорий"),
+                new FoodLibrary.MenuItem("BookImage.jpg","Справочник продуктов"),
+                new FoodLibrary.MenuItem("SettingsImage.jpg","Настройки"),
+                new FoodLibrary.MenuItem("AboutImage.jpg","О программе")
+            };
+            this.BindingContext = this;
 
             Detail = new NavigationPage(new StartPage(ListOfTypes));
+
         }
 
-        private async Task GetInfo()
+        private void MenuClick(object sender, EventArgs e)
         {
-            var uri = new Uri(string.Format("https://fooddietapi.azurewebsites.net/api/typeoffood", string.Empty));
-
-            try
+            this.IsPresented = false;
+            string name = ((FoodLibrary.MenuItem)((ItemTappedEventArgs)e).Item).Name;
+            MenuList.SelectedItem = null;
+            switch (name)
             {
-                var response = await client.GetAsync(uri);
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    ListOfTypes = JsonConvert.DeserializeObject<List<TypeOfFood>>(content);
-                    foreach (TypeOfFood type in ListOfTypes)
-                    {
-                        type.TypeColor = Color.FromHex("#FFFACD");
-                        foreach (Food food in type.ListOfFood)
-                        {
-                            food.FoodColor = Color.FromHex("#FFFACD");
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                await DisplayAlert("Ошибка!", "Отсутствует подключение к сети", "Ок");
+                case "Составить диету":
+                    Detail = new NavigationPage(new CreatingDietPage(ListOfTypes));
+                    break;
+                case "Калькулятор калорий":
+                    Detail = new NavigationPage(new CalculatorPage());
+                    break;
+                case "Справочник продуктов":
+                    Detail = new NavigationPage(new TypesOfFoodPage(ListOfTypes));
+                    break;
+                case "Настройки":
+                    break;
+                case "О программе":
+                    break;
             }
         }
 
-        private void CreateDiet_Click(object sendler, EventArgs e)
+        private void CreateDatabase()
         {
-            Detail = new NavigationPage(new CreatingDietPage(ListOfTypes));
-        }
-        private void Calculator_Click(object sendler, EventArgs e)
-        {
-            Detail = new NavigationPage(new CalculatorPage());
-        }
-        private void SearchService_Click(object sendler, EventArgs e)
-        {
-            Detail = new NavigationPage(new TypesOfFoodPage(ListOfTypes));
-        }
-        private void AboutProgram_Click(object sendler, EventArgs e)
-        {
-
-        }
-        private void Settings_Click(object sendler, EventArgs e)
-        {
-
+            string str = "drop table if exists foodtable;"
+            + "\ncreate table foodtable(Id int identity(1 , 1) primary key , FoodName nvarchar(30), Callories float, Protein float , Fat float, Carbohydrate float, TypeId int);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Баранина', 201, 16.2, 15.3, 0,1), ('Баранье сердце', 85, 13.6, 2.7, 0,1),('Бараньи почки',78,13.4,2.6,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Баранья печень', 102, 18.9, 2.8, 0,1),('Говядина',191,18.7,12.6,0,1),('Говяжий язык',160,13.4,12.1,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Говяжье вымя', 176, 12.1, 13.8, 0,1),('Говяжье сердце',89,15.2,3.1,0,1),('Говяжьи почки',67,12.4,1.9,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Говяжьи мозги', 126, 9.3, 9.6, 0,1),('Говяжья печень',100,17.6,3.2,0,1),('Гусятина',359,16.4,33.1,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Индейка', 192, 21.1, 12.3, 0.6,1),('Конина',149,20.3,7.1,0,1),('Кролик',197,20.6,12.8,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Курица', 161, 20.4, 8.6, 0.8,1),('Свиная печень',105,18.6,3.5,0,1),('Свинина жирная',484,11.6,49.1,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Свинина нежирная', 318, 16.3, 27.9, 0,1),('Свиное сердце',87,15.2,3.1,0,1),('Свиной язык',203,14.4,16.5,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Свиные почки', 84, 13.2, 3.2, 0,1),('Телятина',91,19.9,1.1,0,1),('Утятина',348,16.4,61.3,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Колбаса вареная Докторская', 257, 13.4, 22.9, 0,1),('Колбаса вареная Молочная',243,11.1,22.5,0,1),('Колбаса полукопч. Московская',402,19.1,36.1,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Колбаса полукопч. Сервелат', 423, 16.1, 40.2, 0,1),('Колбаса сырокопч. Московская',476,24.3,41.6,0,1),('Колбаса сырокопч. Сервелат',453,24.1,40.2,0,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Колбаски охотничьи', 325, 27.1, 24.6, 0,1),('Кровянка',261,10.6,17.8,14.5,1),('Салями',576,21.3,53.6,1.1,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Сардельки Говяжьи', 215, 11.1, 18.2, 1.6,1),('Сардельки Свиные',330,10.1,31.8,1.7,1),('Сосиски Говяжьи',229,10.3,20.3,0.9,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Сосиски Куриные', 242, 10.6, 22.1, 3.3,1),('Сосиски Молочные', 260, 11.3, 23.9,1.1,1),('Сосиски Свиные',284,9.2,23.2,4.5,1);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Жир свиной топленый', 882, 0, 99.5, 0,2),('Маргарин сливочный',746,0.5,82.3,0,2),('Маргарин столовый молочный',744,0.5,82,0.9,2);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Майонез', 624, 3.3, 67, 2.4,2),('Масло льняное',898,0,99.8,0,2),('Масло оливковое',898,0,99.8,0,2);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Масло подсолнечное', 899, 0, 99.9, 0,2),('Масло сливочное 82,5%',747,0.5,82.5,1,2),('Масло топленое',885,0.4,98.1,0.5,2);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Сало свиное', 797, 2.4, 89, 0,2),('Бычки',147,12.7,8.2,5.1,3),('Вобла',95,18,2.8,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Горбуша', 140, 20.5, 6.5, 0,3),('Горбуша натуральная(консервы)',136,20.9,5.8,0,3),('Икра красная зернистая',249,31.5, 13.2,1,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Икра черная зернистая', 235, 26.8, 13.8, 0.8,3),('Кальмары',100,18,2.2,2,3),('Камбала',90,15.7,3,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Карась', 84, 17.5, 1.6, 0,3),('Карп',95,16,3.5,0,3),('Кета',127,19,5.6,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Килька балтийская', 137, 14.1, 9, 0,3),('Килька каспийская',192,18.5,13.1,0,3),('Корюшка',93,15.3,3.3,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Крабовое мясо', 67, 16, 0.9, 0,3),('Крабовые палочки',73,17.9,2.1,0,3),('Красноперка',106,18.5,3.1,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Креветка', 98, 20.5, 1.6, 0.3,3),('Лещ',105,17.1,4.4,0,3),('Лосось атлантический(сёмга)',153,20,8.1,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Макрель', 111, 20.2, 3.6, 0,3),('Мидии',77,11.5,2,3.3,3),('Минтай',72,15.9,0.9,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Мойва', 166, 13.4, 12.6, 0,3),('Навага',78,16.7,1.3,0,3),('Налим',85,18.6,0.8,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Окунь морской', 103, 18.2, 3.3, 0,3),('Окунь речной',82,18.5,0.9,0,3),('Осетр',161,16.5,10.5,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Осьминог', 74, 18.5, 0, 0,3),('Палтус',106,18.5,3.2,0,3),('Печень трески(консерва)',613,4.2,65.7,1.2,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Плотва', 108, 18.5, 0.4, 0,3),('Рак речной',76,15.5,1,1.2,3),('Сазан',97,18.2,2.7,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Сайра', 257, 18.3, 20.5, 0,3),('Салака',124,17.1,5.8,0,3),('Сельдь жирная',248,17.7,19.5,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Сельдь нежирная', 135, 19.1, 6.5, 0,3),('Сельдь среднесолёная',145,17,8.5,0,3),('Сиг',141,19,7.3,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Скумбрия', 191, 18, 13.2, 0,3),('Скумбрия в масле(консерва)',318,14.4,28.9,0,3),('Сом',115,17.2,5.1,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Ставрида', 114, 18.5, 4.5, 0,3),('Стерлядь',126,17.3,6.3,0,3),('Судак',84,18.4,1.1,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Треска', 69, 16, 0.6, 0,3),('Тунец',139,24.4,4.6,0,3),('Угорь',333,14.5,30.5,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Устрицы', 72, 9, 2, 4.5,3),('Форель',99,19.6,2.1,0,3),('Хек',84,16.4,2.3,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Шпроты в масле(консерва)', 363, 17.4, 32.4, 0,3),('Щука',84,18.4,1.1,0,3),('Язык морской',89,10.3,5.3,0,3);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Ацидофилин 1%', 40, 3, 1, 4,4),('Ацидофилин 3.2%',59,2.9,3.2,3.8,4),('Афидофилин 3.2% сладкий',77,2.8,3.2,8.6,4);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Ацидофилин нежирный', 31, 3, 0, 3.9,4),('Брынза',262,22.1,19.2,0.4,4),('Варенец 2.5%',53,2.9,2.5,4.1,4),('Йогурт 1.5%',57,4.1,1.5,5.9,4),('Йогурт 1.5% плодово-ягодный',90,4,1.5,14.3,4),('Йогурт 3.2%',68,5,3.2,3.5,4),('Йогурт 3.2% сладкий',87,5,3.2,8.5,4),('Йогурт 6%',92,5,6,3.2,4),('Йогурт 6% сладкий',112,5,6,8.5,4);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Кефир 1%', 40, 3, 1, 4,4),('Кефир 2.5%',53,2.9,2.5,4,4),('Кефир 3.2%',59,2.9,3.2,4,4),('Кефир нежирный',31,3,0,4,4),('Кумыс лошадиный',50,2.1,1.9,5,4),('Кумыс коровий',41,3,0,6.3,4),('Масло сладкосливочное',748,0.5,82.5,0.8,4),('Масло сливочное',661,0.8,72.5,1.3,4),('Масло топленое',892,0.2,99,0,4),('Масса творожная 16.5%',232,12,16.5,9.5,4),('Молоко 1.5%',45,3,1.5,4.8,4),('Молоко 2.5%',54,2.9,2.5,4.8,4),('Молоко 3.2%',60,2.9,3.2,4.7,4);"
+            + "\ninsert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId) values('Молоко 3.5%', 62, 2.9, 3.5, 4.7,4),('Молоко козье',69,3.6,4.1,4.5,4),('Молоко нежирное',32,3,0,4.9,4),('Сгущенка с сахаром 5%',295,7.1,5,55.2,4),('Сгущенка с сахаром 8.5%',328,7.2,8.5,55.5,4); ";
+            string[] arr = str.Split('\n');
+            foreach (string s in arr)
+            {
+                App.FoodTable.Execute(s);
+            }
+            App.FoodTable.Execute("insert into foodtable(Foodname, Callories, Protein, Fat, Carbohydrate,TypeId)"
+            + " values('Сгущенка нежирная', 259, 7.5, 0.2, 56.8,4),"
+            + "  ('Молоко сухое 15%',432,28.5,15,44.7,4),"
+            + "  ('Молоко сухое 25%',483,24.2,25,39.3,4),"
+            + "  ('Молоко сухое нежирное',362,33.2,1,52.6,4),"
+            + "  ('Мороженое пломбир',232,3.7,15,20.4,4),"
+            + "  ('Мороженое сливочное',183,3.3,10,19.4,4),"
+            + "  ('Пахта',41,3.3,1,4.7,4),"
+            + "  ('Простокваша 1%',40,3,1,4.1,4),"
+            + "  ('Простокваша 2.5%',53,2.9,2.5,4.1,4),"
+            + "  ('Простокваша 3.2%',59,2.9,3.2,4.1,4),"
+            + "  ('Простокваша нежирная',30,3,0,3.8,4),"
+            + "  ('Ряженка 1%',40,3,1,4.2,4),"
+            + "  ('Ряженка 2.5%',54,2.9,2.5,4.2,4),"
+            + "  ('Ряженка 4%',67,2.8,4,4.2,4),"
+            + "  ('Ряженка 6%',85,3,6,4.1,4),"
+            + "  ('Сливки 10%',119,2.7,10,4.5,4),"
+            + "  ('Сливки 20%',207,2.5,20,4,4),"
+            + "  ('Сливки 25%',251,2.4,25,3.9,4),"
+            + "  ('Сливки 35%',337,2.2,35,3.2,4),"
+            + "  ('Сливки 8%',102,2.8,8,4.5,4),"
+            + "  ('Сливки сгущённые 19%',392,8,19,47,4),"
+            + "  ('Сливки сухие 42%',577,19,42,30.2,4),"
+            + "  ('Сметана 10%',119,2.7,10,3.9,4),"
+            + "  ('Сметана 15%',162,2.6,15,3.6,4),"
+            + "  ('Сметана 20%',206,2.5,20,3.4,4),"
+            + "  ('Сметана 25%',250,2.4,25,3.2,4),"
+            + "  ('Сметана 30%',293,2.3,30,3.1,4),"
+            + "  ('Сыр Адыгейский',264,19.8,19.8,1.5,4),"
+            + "  ('Сыр Голладндский',350,26.3,26.6,0,4),"
+            + "  ('Сыр Камамбер',324,15.3,28.8,0,4),"
+            + "  ('Сыр Пармезан',392,35.7,25.8,0.8,4),"
+            + "  ('Сыр Пошехонский',344,26,26.1,0,4),"
+            + "  ('Сыр Рокфор',335,20.5,27.5,0,4),"
+            + "  ('Сыр Российский',364,23.2,29.5,0,4),"
+            + "  ('Сыр Сулугуни',286,20.5,22,0.4,4),"
+            + "  ('Сыр Фета',264,14.2,21.3,4.1,4),"
+            + "  ('Сыр Чеддер',380,23.5,30.8,0,4),"
+            + "  ('Сыр Швейцарский',391,24.6,31.6,0,4),"
+            + "  ('Сыр Гауда',356,24.9,27.4,2.2,4),"
+            + "  ('Сыр нежирный',86,18,0.6,1.5,4),"
+            + "  ('Сыр плавленный',275,21.2,19.4,3.7,4),"
+            + "  ('Творог 0%', 110,22,0.6,3.3,4),"
+            + "  ('Творог 2%',114,20,2,3,4),"
+            + "  ('Творог 4%',136,21,4,3,4),"
+            + "  ('Творог 5%',145,21,5,3,4),"
+            + "  ('Творог 9%',169,18,9,3,4),"
+            + "  ('Творог 11%',178,16,11,3,4),"
+            + "  ('Творог 18%',236,15,18,2.8,4);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate,TypeId)"
+            + " values('Баклажаны', 24, 1.2, 0.1, 4.5,5),"
+            + " ('Брюква',37,1.2,0.1,7.7,5),"
+            + " ('Кабачки',24,0.6,0.3,4.6,5),"
+            + " ('Капуста белокочанная',28,1.8,0.1,4.7,5),"
+            + " ('Брокколи',34,2.8,0.4,6.6,5),"
+            + " ('Брюссельская капуста',35,4.8,0.3,3.1,5),"
+            + " ('Квашеная капуста',23,1.8,0.1,3,5),"
+            + " ('Кольбари', 44,2.8,0.1,7.9,5),"
+            + " ('Капуста краснокочанная',26,0.8,0.2,5.1,5),"
+            + " ('Капуста пекинская',16,1.2,0.2,2,5),"
+            + " ('Капуста савойская',28,1.2,0.1,6,5),"
+            + " ('Капуста цветная',30,2.5,0.3,4.2,5),"
+            + " ('Картофель',77,2,0.4,16.3,5),"
+            + " ('Лук порей',36,2,0.2,6.3,5),"
+            + " ('Лук репчатый',41,1.4,0.2,8.2,5),"
+            + " ('Морковь',35,1.3,0.1,6.9,5),"
+            + " ('Морская капуста',25,0.9,0.2,3,5),"
+            + " ('Огурцы',14,0.8,0.1,2.5,5),"
+            + " ('Перец сладкий',26,1.3,0.1,4.9,5),"
+            + " ('Помидоры',24,1.1,0.2,3.8,5),"
+            + " ('Редис',20,1.2,0.1,3.4,5),"
+            + " ('Редька чёрная',35,1.9,0.2,6.7,5),"
+            + " ('Репа',32,1.5,0.1,6.2,5),"
+            + " ('Салат',16,1.5,0.2,2,5),"
+            + " ('Свёкла',42,1.5,0.1,8.8,5),"
+            + " ('Сельдерей',34,1.3,0.3,6.5,5),"
+            + " ('Топинамбур',61,2.1,0.1,12.8,5),"
+            + " ('Тыква',22,1,0.1,4.4,5),"
+            + " ('Шпинат',23,2.9,0.3,2,5);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Бобы', 57, 6, 0.1, 8.5, 6),"
+            + "('Горох лущёный',299,23,1.6,48.1,6),"
+            + "('Горох зеленый свежий',55,5,0.2,8.3,6),"
+            + "('Маш',300,23.5,2,46,6),"
+            + "('Нут',309,20.1,4.3,46.1,6),"
+            + "('Соя(зерно)',364,34.9,17.3,17.3,6),"
+            + "('Фасоль(зерно)',298,21,2,47,6),"
+            + "('Фасоль(стручковая)',23,2.5,0.3,3,6),"
+            + "('Чечевица(зерно)',295,24,1.5,46.3,6),"
+            + "('Абрикосы',44,0.9,0.1,9,7),"
+            + "('Авокадо',160,2,14.6,1.8,7),"
+            + "('Айва',48,0.6,0.5,9.6,7),"
+            + "('Алыча',34,0.2,0.1,7.9,7),"
+            + "('Ананасы',52,0.4,0.2,11.5,7),"
+            + "('Апельсины',43,0.9,0.2,8.1,7),"
+            + "('Арбузы',27,0.6,0.1,5.8,7),"
+            + "('Бананы',96,1.5,0.5,21,7),"
+            + "('Брусника',46,0.7,0.5,8.2,7),"
+            + "('Виноград',72,0.6,0.6,15.5,7),"
+            + "('Вишня',52,0.8,0.2,10.6,7),"
+            + "('Голубика',39,1,0.5,6.6,7),"
+            + "('Гранаты',72,0.7,0.6,14.5,7),"
+            + "('Грейпфрут',35,0.7,0.6,14.5,7),"
+            + "('Груши',47,0.4,0.3,10.3,7),"
+            + "('Дуриан',147,1.5,5.3,27.1,7),"
+            + "('Дыни',35,0.6,0.3,7.4,7),"
+            + "('Ежевика',34,1.5,0.5,4.4,7),"
+            + "('Земляника',41,0.8,0.4,7.5,7),"
+            + "('Киви',47,0.8,0.4,8.1,7),"
+            + "('Клюква',28,0.5,0.2,3.7,7),"
+            + "('Клубника',32,0.7,0.3,5.7,7),"
+            + "('Крыжовник',45,0.7,0.2,9.1,7),"
+            + "('Лимоны',34,0.9,0.1,3,7),"
+            + "('Малина',46,0.8,0.5,8.3,7),"
+            + "('Манго',60,0.8,0.4,15,7),"
+            + "('Мандарины',38,0.8,0.2,7.5,7),"
+            + "('Морошка',40,0.8,0.9,7.4,7),"
+            + "('Нектарины',44,1.1,0.3,10.5,7),"
+            + "('Облепиха',82,1.2,5.4,5.7,7),"
+            + "('Папайя',43,0.5,0.3,10.8,7),"
+            + "('Персики',45,0.9,0.1,9.5,7),"
+            + "('Помело',38,0.8,0,9.6,7);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Рябина красная', 50, 1.4, 0.2, 8.9, 7),"
+            + "('Рябина черная',55,1.5,0.2,10.9,7),"
+            + "('Слива',49,0.8,0.3,9.6,7),"
+            + "('Смородина белая',42,0.5,0.2,8,7),"
+            + "('Смородина красная',43,0.6,0.2,7.7,7),"
+            + "('Смородина черная',44,1,0.4,7.3,7),"
+            + "('Фейхоа',61,0.7,0.4,15.2,7),"
+            + "('Хурма',67,0.5,0.4,15.3,7),"
+            + "('Черешня',52,1.1,0.4,10.6,7),"
+            + "('Черника',44,1.1,0.4,10.6,7),"
+            + "('Шелковица',50,0.6,0,12.5,7),"
+            + "('Шиповник',109,1.6,0.7,22.4,7),"
+            + "('Яблоки',47,0.4,0.4,9.8,7);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Изюм', 281, 2.3, 0.5, 65.8, 8),"
+            + "('Инжир',257,3.1,0.8,57.9,8),"
+            + "('Курага',232,5.2,0.3,51,8),"
+            + "('Урюк',279,5.3,0,67.9,8),"
+            + "('Финики',292,2.5,0.5,69.2,8),"
+            + "('Чернослив',256,2.3,0.7,57.5,8),"
+            + "('Арахис',552,26.3,45.2,9.9,8),"
+            + "('Грецкие',656,16.2,60.8,11.1,8),"
+            + "('Кедровые',875,13.7,68.4,13.1,8),"
+            + "('Кешью',600,18.5,48.5,22.5,8),"
+            + "('Миндаль',609,18.6,53.7,13,8),"
+            + "('Фисташки',560,20.2,45.3,27.2,8),"
+            + "('Фундук',653,13,62.6,9.3,8);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Белые грибы', 34, 3.7, 1.7, 1.1, 9),"
+            + "('Вешенка',33,3.3,0.4,6.1,9),"
+            + "('Грузди',16,1.8,0.5,0.8,9),"
+            + "('Лисички',19,1.5,1,1,9),"
+            + "('Маслята',12,2.5,0.7,1.5,9),"
+            + "('Опята',22,2.2,1.2,0.5,9),"
+            + "('Подберёзовики',20,2.1,0.8,1.2,9),"
+            + "('Подосиновики',22,3.3,0.5,1.2,9),"
+            + "('Портобелло',26,2.5,0.2,3.6,9),"
+            + "('Рыжик',17,1.9,0.8,0.5,9),"
+            + "('Сморчок',31,3.1,0.6,5.1,9),"
+            + "('Сыроежки',19,1.7,0.7,1.5,9),"
+            + "('Трюфели',51,5.9,0.5,5.3,9),"
+            + "('Чернушка',9,1.5,0.3,0.1,9),"
+            + "('Шампиньоны',27,4.3,1,0.1,9),"
+            + "('Шиитаке',34,2.2,0.5,6.8,9),"
+            + "('Гречиха(зерно)',296,10.8,3.2,56,10),"
+            + "('Гречневая(продел) крупа',300,9.5,2.3,60.4,10),"
+            + "('Гречневая(ядрица) крупа',308,12.6,3.3,57.1,10),"
+            + "('Кукурузная крупа',328,8.3,1.2,71,10),"
+            + "('Манная крупа',333,10.3,1,70.6,10),"
+            + "('Овёс(зерно)',316,10,6.2,55.1,10),"
+            + "('Овсяная крупа',342,12.3,6.1,59.5,10),"
+            + "('Геркулес',352,12.3,6.2,61.8,10),"
+            + "('Перловая крупа',315,9.3,1.1,66.9,10),"
+            + "('Пщеница(зерно)',304,12,2.3,58.5,10),"
+            + "('Пщеничная крупа',329,11,1.2,68.5,10),"
+            + "('Пшено',342,11.5,3.3,66.5,10),"
+            + "('Рис(зерно)',303,7.5,2.6,62.3,10),"
+            + "('Рисовая крупа',333,7,1,74,10),"
+            + "('Рожь(зерно)',283,9.9,2.2,55.8,10),"
+            + "('Ячмень(зерно)',288,10.3,2.4,56.4,10),"
+            + "('Ячневая крупа',313,10,1.3,65.4,10);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Лапша китайская', 521, 10.4, 31.8, 50, 10),"
+            + "('Лапша яичная',384,14,4.4,68,10),"
+            + "('Соба',336,14.4,0.8,74.6,10),"
+            + "('Сомен',356,11.4,0.8,69.8,10),"
+            + "('Макароны',333,11.2,1.6,68.4,10),"
+            + "('Макароны молочные',345,11.5,2.9,67,10),"
+            + "('Паста из кукурузной',357,7.5,2,68.3,10);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Вафли', 425, 8.2, 19.8, 53.1, 11),"
+            + "('Гематоген',352,6.2,2.8,75.5,11),"
+            + "('Драже фруктовое',288,3.7,10.3,73.4,11),"
+            + "('Зефир',295,0.7,0,77.3,11),"
+            + "('Ирис',384,3.1,7.7,81.2,11),"
+            + "('Карамель',291,0,0.2,77.3,11),"
+            + "('Конфеты шоколадные',576,3.9,39.7,54.6,11),"
+            + "('Мармелад',289,0,0.2,77.1,11),"
+            + "('Мед',312,0.6,0,80.5,11),"
+            + "('Пастила',301,0.6,0,80.1,11),"
+            + "('Печенье овсяное',430,6.5,14.1,71.4,11),"
+            + "('Печенье сдобное',447,10.5,5.2,76,11),"
+            + "('Пирожное слоеное',543,5.7,38.3,46.8,11),"
+            + "('Пирожное бисквитное',338,4.9,9.1,84.1,11),"
+            + "('Пряники',333,4.4,2.9,77.1,11),"
+            + "('Сахар',377,0.2,0,99.6,11),"
+            + "('Халва подсолнечная',519,11.4,29.3,54.6,11),"
+            + "('Шоколад темный',546,5.2,35.6,52.4,11),"
+            + "('Шоколад молочный',552,6.7,35.6,52.4,11);");
+            App.FoodTable.Execute("insert into foodtable(FoodName, Callories, Protein, Fat, Carbohydrate, TypeId)"
+            + "values('Баранки', 342, 16.4, 1.1, 69.7, 12),"
+            + "('Батон нарезной',261,9.4,2.7,50.7,12),"
+            + "('Бублики',342,16.4,1.1,69.7,12),"
+            + "('Булочка',218,7.4,1.8,43.7,12),"
+            + "('Лаваш армянский',239,7.7,1.1,47.8,12),"
+            + "('Сушки',335,11.1,1,73.2,12),"
+            + "('Сухари пшеничные',327,11.6,1.8,72.1,12),"
+            + "('Хлеб ржаной',210,4.7,0.6,49.5,12),"
+            + "('Хлеб пшеничный',246,7.4,2.2,53,12);");
+            string str1 = "drop table if exists typeoffoodtable;" +
+                "\ncreate table typeoffoodtable(Id int  identity(1 , 1) primary key , TypeName nvarchar(30), TypeImage nvarchar(100));" +
+            "\ninsert into typeoffoodtable(TypeName,TypeImage) values('Мясо и колбасные изделия','MeatImage.png'),('Масла и жиры','OilImage.png'),('Рыба и морепродукты','FishImage.png'),('Молочные продукты','MilkImage.png'),('Овощи','VegetablesImage.png'),('Бобовые','BeansImage.png'),('Фрукты и ягоды','FruitsImage.png'),('Орехи и сухофрукты','NutsImage.png'),('Грибы','MushroomsImage.png'),('Крупы и макаронные изделия','CroupImage.png'),('Кондитерские изделия','CandyImage.png'),('Хлебобулочные изделия','BreadImage.png');";
+            string[] arr1 = str1.Split('\n');
+            foreach (string s in arr1)
+            {
+                App.FoodTable.Execute(s);
+            }
         }
     }
 }

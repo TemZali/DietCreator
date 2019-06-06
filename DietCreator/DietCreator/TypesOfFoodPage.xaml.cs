@@ -22,7 +22,9 @@ namespace DietCreator
         }
         private async void TypeChoice_Click(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new TypeOfFoodPage((TypeOfFood)((ItemTappedEventArgs)e).Item));
+            object item = ((ItemTappedEventArgs)e).Item;
+            TypesListView.SelectedItem = null;
+            await Navigation.PushAsync(new TypeOfFoodPage((TypeOfFood)(item)));
         }
     }
 }

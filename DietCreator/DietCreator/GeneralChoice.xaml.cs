@@ -15,6 +15,7 @@ namespace DietCreator
         public List<Food> Meat { get; set; }
         public List<Food> FatFood { get; set; }
         public List<Food> CarbonFood { get; set; }
+        public int Count { get; set; }
 
         public List<TypeOfFood> TypesOfFoodList { get; set; }
 
@@ -22,8 +23,9 @@ namespace DietCreator
 
         public double Weight { get; set; }
 
-        public GeneralChoice(double CalResult, double Weight, List<TypeOfFood> types)
+        public GeneralChoice(double CalResult, double Weight, List<TypeOfFood> types, int count)
         {
+            Count = count;
             this.CalResult = CalResult;
             this.Weight = Weight;
             TypesOfFoodList = types;
@@ -33,7 +35,7 @@ namespace DietCreator
             this.BindingContext = this;
         }
 
-        public async Task<bool> CheckFood(double CalResult)
+        public async Task<bool> CheckFood()
         {
             List<Food> PickedFood = new List<Food>();
             Meat = new List<Food>();
@@ -51,7 +53,7 @@ namespace DietCreator
             }
             foreach (Food food in PickedFood)
             {
-                if (food.Protein >= 9 && food.Protein > food.Fat && food.Protein > food.Carbohydrate)
+                if (food.Protein >= 9 && food.Protein > food.Carbohydrate)
                 {
                     Meat.Add(food.GetCopy());
                     food.IsPicked = false;
@@ -59,7 +61,7 @@ namespace DietCreator
             }
             foreach (Food food in PickedFood)
             {
-                if (food.Carbohydrate >= 35 && food.Carbohydrate <= 74 && food.Callories <= 352)
+                if (food.Carbohydrate>50&&food.Callories<450)
                 {
                     CarbonFood.Add(food.GetCopy());
                     food.IsPicked = false;
@@ -73,7 +75,15 @@ namespace DietCreator
                     food.IsPicked = false;
                 }
             }
-            if (FatFood.Count == 0)
+            bool flag = false;
+            foreach(Food food in FatFood)
+            {
+                if (food.Fat >= 9 && food.Fat > food.Protein)
+                {
+                    flag = true;
+                }
+            }
+            if (FatFood.Count == 0||!flag)
             {
                 await DisplayAlert("Ошибка", "Отсутствуют продукты, содержищие жиры. Возможно, стоит добавить в список продуктов орехи, масла, жиры или колбасные изделия", "Ок");
             }
@@ -89,13 +99,11 @@ namespace DietCreator
             {
                 foreach (TypeOfFood type in TypesOfFoodList)
                 {
-                    type.TypeColor = Color.FromHex("#FFFACD");
                     foreach (Food food in type.ListOfFood)
                     {
                         if (food.IsPicked)
                         {
                             food.IsPicked = false;
-                            food.FoodColor = Color.FromHex("#FFFACD");
                         }
                     }
                 }
@@ -106,24 +114,23 @@ namespace DietCreator
 
         private async void CreateSave_Click(object sender, EventArgs e)
         {
-            if (await CheckFood(CalResult / 4))
+            if (await CheckFood())
             {
-                await Navigation.PushAsync(new FinalPage(CalResult / 4, Weight, Meat, FatFood, CarbonFood));
+                await Navigation.PushAsync(new FinalPage(false, Weight, Meat, FatFood, CarbonFood,Count));
             }
         }
         private async void CreateLose_Click(object sender, EventArgs e)
         {
-            if (await CheckFood(CalResult * 0.2))
+            if (await CheckFood())
             {
-                await Navigation.PushAsync(new FinalPage(CalResult * 0.2, Weight, Meat, FatFood, CarbonFood));
+                await Navigation.PushAsync(new FinalPage(true, Weight, Meat, FatFood, CarbonFood,Count));
             }
         }
         private async void TypePick(object sender, EventArgs e)
         {
-            ((TypeOfFood)((ItemTappedEventArgs)e).Item).TypeColor = Color.Green;
-            TypesListView.ItemsSource = null;
-            TypesListView.ItemsSource = TypesOfFoodList;
-            await Navigation.PushAsync(new FoodPickPage((TypeOfFood)((ItemTappedEventArgs)e).Item));
+            TypeOfFood type = (TypeOfFood)((ItemTappedEventArgs)e).Item;
+            TypesListView.SelectedItem = null;
+            await Navigation.PushAsync(new FoodPickPage(type));
         }
     }
 }

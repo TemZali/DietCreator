@@ -6,14 +6,16 @@
 
     <ContentPage.Content>
         <ListView ItemsSource="{Binding FoodList}"
+                  x:Name="TypeListView"
                   HasUnevenRows="True"
                   ItemTapped="FoodChoice_Click">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
                         <ViewCell.View>
-                            <StackLayout BackgroundColor="#FFFACD" >
-                                <Label Text="{Binding Name}" FontSize="Large" TextColor="Black" HeightRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <StackLayout Margin="8">
+                                <Label Text="{Binding FoodName}" TextColor="Black" FontSize="Medium"/>
+                                <Label Text="{Binding CPFCString,StringFormat='КБЖУ на 100г: {0}'}"/>
                             </StackLayout>
                         </ViewCell.View>
                     </ViewCell>

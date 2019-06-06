@@ -6,23 +6,26 @@
     <ContentPage.Content>
         <StackLayout>
             <ListView ItemsSource="{Binding TypesOfFoodList}"
+                  x:Name="TypesListView"
+                  BackgroundColor="White"
+                  SeparatorVisibility="None"
                   HasUnevenRows="True"
-                      ItemTapped="TypePick"
-                      x:Name="TypesListView">
+                      ItemTapped="TypePick">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <ViewCell.View>
-                                <StackLayout BackgroundColor="{Binding TypeColor}" x:Name="ListLayout" HorizontalOptions="FillAndExpand" >
-                                    <Label Text="{Binding Name}" TextColor="Black" HeightRequest="50"  FontSize="Large" HorizontalOptions="Center"/>
+                                <StackLayout Orientation="Horizontal" BackgroundColor="White" Margin="8">
+                                    <Image Source="{Binding TypeImage}" HeightRequest="64"/>
+                                    <Label Margin="8" Text="{Binding TypeName}" VerticalOptions="Center" TextColor="Black" FontSize="Medium" />
                                 </StackLayout>
                             </ViewCell.View>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Button VerticalOptions="FillAndExpand" BackgroundColor="Yellow" Text="Диета для сохранения веса" Clicked="CreateSave_Click"/>
-            <Button VerticalOptions="FillAndExpand" BackgroundColor="Yellow" Text="Диета для похудения" Clicked="CreateLose_Click"/>
+            <Button HorizontalOptions="FillAndExpand" CornerRadius="5" BackgroundColor="#5c6bc0" TextColor="White" Text="Диета для сохранения веса" Clicked="CreateSave_Click"/>
+            <Button HorizontalOptions="FillAndExpand" CornerRadius="5" BackgroundColor="#5c6bc0" TextColor="White" Text="Диета для похудения" Clicked="CreateLose_Click"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

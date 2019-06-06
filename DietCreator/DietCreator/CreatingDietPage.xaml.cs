@@ -20,37 +20,41 @@ namespace DietCreator
             InitializeComponent();
         }
 
-        private void StepActivity(object sender, ValueChangedEventArgs e)
+        private async void ActivityValueChanged(object sender, EventArgs e)
         {
-            if (e.NewValue >= 1.0 && e.NewValue <= 2.0)
+            try
             {
-                ActivityCoefficientInfo.Text = "Коэффициент активности равен:" + e.NewValue.ToString();
-            }
-            switch ((int)(10 * e.NewValue))
-            {
-                case 10:
-                case 11:
-                case 12:
-                    ActivityInfo1.Text = "Минимальный уровень физической нагрузки или полное ее отсутствие (сидячая работа, отсутствие спорта).";
-                    break;
-                case 13:
-                case 14:
-                    ActivityInfo1.Text = "Легкий уровень активности (легкие физические упражнения" +
+                double ActivityValue = double.Parse(ActivityCoefficientInfo.Text);
+                if (ActivityValue < 1 || ActivityValue > 2)
+                {
+                    throw new ApplicationException();
+                }
+                if (ActivityValue <= 1.2)
+                {
+                    ActivityInfo.Text = "Минимальный уровень физической нагрузки или полное ее отсутствие (сидячая работа, отсутствие спорта).";
+                }
+                else if (ActivityValue <= 1.4)
+                {
+                    ActivityInfo.Text = "Легкий уровень активности (легкие физические упражнения" +
                         " около 3 раз в неделю, ежедневная утренняя зарядка, пешие прогулки).";
-                    break;
-                case 15:
-                case 16:
-                    ActivityInfo1.Text = "Cредняя активность (спорт до 5 раз в неделю).";
-                    break;
-                case 17:
-                case 18:
-                    ActivityInfo1.Text = "Aктивность высокого уровня (активный образ жизни вкупе с ежедневными интенсивными тренировками).";
-                    break;
-                case 19:
-                case 20:
-                    ActivityInfo1.Text = "Экстремально высокая активность " +
+                }
+                else if (ActivityValue <= 1.6)
+                {
+                    ActivityInfo.Text = "Cредняя активность (спорт до 5 раз в неделю).";
+                }
+                else if (ActivityValue <= 1.8)
+                {
+                    ActivityInfo.Text = "Aктивность высокого уровня (активный образ жизни вкупе с ежедневными интенсивными тренировками).";
+                }
+                else
+                {
+                    ActivityInfo.Text = "Экстремально высокая активность " +
                         "(спортивный образ жизни, тяжелый физический труд, длительные тяжелые тренировки каждый день).";
-                    break;
+                }
+            }
+            catch
+            {
+                await DisplayAlert("Ошибка", "Введены некорректные данные о коэффициенте активности", "Ок");
             }
         }
 
@@ -58,19 +62,20 @@ namespace DietCreator
         {
 
             double WeightD, HighD, AgeD, CalResult;
+            int count;
 
-            if (double.TryParse(Weight.Text, out WeightD) && double.TryParse(High.Text, out HighD)
+            if (double.TryParse(Weight.Text, out WeightD) && double.TryParse(High.Text, out HighD)&&int.TryParse(Count.Text,out count)&&count>0
                 && double.TryParse(Age.Text, out AgeD) && (Picker1.SelectedIndex != -1) && (WeightD <= 300) && (HighD <= 300) && (AgeD <= 130))
             {
                 if (Picker1.SelectedIndex == 0)
                 {
-                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD + 5) * ActivityStepper.Value;
+                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD + 5) * double.Parse(ActivityCoefficientInfo.Text);
                 }
                 else
                 {
-                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD - 161) * ActivityStepper.Value;
+                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD - 161) * double.Parse(ActivityCoefficientInfo.Text);
                 }
-                await Navigation.PushAsync(new GeneralChoice(CalResult, WeightD, ListOfTypes));
+                await Navigation.PushAsync(new GeneralChoice(CalResult, WeightD, ListOfTypes,count));
             }
             else
             {

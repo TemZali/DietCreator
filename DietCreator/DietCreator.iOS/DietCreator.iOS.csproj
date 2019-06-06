@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="SQLite_iOS.cs" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -148,10 +149,17 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl">
+      <Version>1.5.231</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\..\FoodLibrary\FoodLibrary.csproj">
+      <Project>{ef837932-9b70-40d7-b73a-92a002471e1d}</Project>
+      <Name>FoodLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DietCreator\DietCreator.csproj">
       <Project>{EA35DE9A-DAC3-43C1-A927-D6F5C5E30E2C}</Project>
       <Name>DietCreator</Name>

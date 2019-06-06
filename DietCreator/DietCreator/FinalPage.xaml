@@ -2,14 +2,30 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DietCreator.FinalPage"
-            Title="Диета на 7 дней">
+            Title="Диета на 7 дней"
+              BackgroundColor="#e1e2e1">
     <ContentPage.Content>
         <StackLayout>
-            <ScrollView>
-                <StackLayout x:Name="FinalLayout" Spacing="0" Padding="0">
-                </StackLayout>
-            </ScrollView>
-            <Button Text="Вернуться на главную страницу" Clicked="EndClick"/>
+            <Label Margin="16" Text="Диета составлена в расчете на 4-разовое питание" TextColor="Black" FontSize="Medium"/>
+            <ListView
+            SeparatorVisibility="None"
+            HasUnevenRows="True"
+            x:Name="FinalListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Frame CornerRadius="8" Margin="16" HorizontalOptions="FillAndExpand">
+                                    <StackLayout BackgroundColor="White">
+                                        <Label TextColor="Black" FontSize="Medium"  Text="{Binding Id,StringFormat='Прием пищи №{0}:'}" Margin="8"/>
+                                        <Label TextColor="Black" Text="{Binding Info}" Margin="8" />
+                                    </StackLayout>
+                                </Frame>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

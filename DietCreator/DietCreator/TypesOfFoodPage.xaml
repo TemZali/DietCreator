@@ -5,14 +5,18 @@
              Title="Справочник продуктов">
     <ContentPage.Content>
         <ListView ItemsSource="{Binding TypesOfFoodList}"
+                  x:Name="TypesListView"
+                  BackgroundColor="White"
+                  SeparatorVisibility="None"
                   HasUnevenRows="True"
                   ItemTapped="TypeChoice_Click">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
                         <ViewCell.View>
-                            <StackLayout BackgroundColor="#FFFACD">
-                                <Label Text="{Binding Name}" FontSize="Large"  TextColor="Black" HeightRequest="50" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            <StackLayout Orientation="Horizontal" BackgroundColor="White" Margin="8">
+                                <Image Source="{Binding TypeImage}" HeightRequest="64"/>
+                                <Label Margin="8" Text="{Binding TypeName}" VerticalOptions="Center" TextColor="Black" FontSize="Medium" />
                             </StackLayout>
                         </ViewCell.View>
                     </ViewCell>

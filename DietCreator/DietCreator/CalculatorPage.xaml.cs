@@ -16,39 +16,7 @@ namespace DietCreator
         {
             InitializeComponent();
         }
-        private void StepActivity(object sender, ValueChangedEventArgs e)
-        {
-            if (e.NewValue >= 1.0 && e.NewValue <= 2.0)
-            {
-                ActivityCoefficientInfo.Text = "Коэффициент активности равен:" + e.NewValue.ToString();
-            }
-            switch ((int)(10 * ActivityStepper.Value))
-            {
-                case 10:
-                case 11:
-                case 12:
-                    ActivityInfo.Text = "Минимальный уровень физической нагрузки или полное ее отсутствие (сидячая работа, отсутствие спорта).";
-                    break;
-                case 13:
-                case 14:
-                    ActivityInfo.Text = "Легкий уровень активности (легкие физические упражнения" +
-                        " около 3 раз в неделю, ежедневная утренняя зарядка, пешие прогулки).";
-                    break;
-                case 15:
-                case 16:
-                    ActivityInfo.Text = "Cредняя активность (спорт до 5 раз в неделю).";
-                    break;
-                case 17:
-                case 18:
-                    ActivityInfo.Text = "Aктивность высокого уровня (активный образ жизни вкупе с ежедневными интенсивными тренировками).";
-                    break;
-                case 19:
-                case 20:
-                    ActivityInfo.Text = "Экстремально высокая активность " +
-                        "(спортивный образ жизни, тяжелый физический труд, длительные тяжелые тренировки каждый день).";
-                    break;
-            }
-        }
+
         private async void Calculate_Click(object sender, EventArgs e)
         {
             double WeightD, HighD, AgeD, CalResult;
@@ -58,20 +26,58 @@ namespace DietCreator
             {
                 if (Picker1.SelectedIndex == 0)
                 {
-                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD + 5) * ActivityStepper.Value;
+                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD + 5) * double.Parse(ActivityCoefficientInfo.Text);
                 }
                 else
                 {
-                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD - 161) * ActivityStepper.Value;
+                    CalResult = (9.9 * WeightD + 6.25 * HighD - 4.92 * AgeD - 161) * double.Parse(ActivityCoefficientInfo.Text);
                 }
-                await DisplayAlert("Итог", $"Ежедневный расход калорий:{(int)CalResult}\n" +
-                    $"Необходимое количество белков:{WeightD}г\n" +
-                    $"Количество жиров:{1.1 * WeightD}г\n" +
-                    $"Количество углеводов:{4 * WeightD}г.", "OK");
+
+                SaveTitle.Text = "Диета для поддержания веса(на день)";
+                SaveCallories.Text = $"Каллорий: {CalResult:f0}";
+                SavePFC.Text = $"БЖУ: {WeightD:f0}/{WeightD * 1.1:f0}/{WeightD * 4:f0}г";
             }
             else
             {
                 await DisplayAlert("Ошибка", "Введите корректные данные!", "ОК");
+            }
+        }
+
+        private async void ActivityValueChanged(object sender,EventArgs e)
+        {
+            try
+            {
+                double ActivityValue = double.Parse(ActivityCoefficientInfo.Text);
+                if (ActivityValue < 1 || ActivityValue > 2)
+                {
+                    throw new ApplicationException();
+                }
+                if (ActivityValue <= 1.2)
+                {
+                    ActivityInfo.Text = "Минимальный уровень физической нагрузки или полное ее отсутствие (сидячая работа, отсутствие спорта).";
+                }
+                else if (ActivityValue <= 1.4)
+                {
+                    ActivityInfo.Text = "Легкий уровень активности (легкие физические упражнения" +
+                        " около 3 раз в неделю, ежедневная утренняя зарядка, пешие прогулки).";
+                }
+                else if (ActivityValue <= 1.6)
+                {
+                    ActivityInfo.Text = "Cредняя активность (спорт до 5 раз в неделю).";
+                }
+                else if (ActivityValue <= 1.8)
+                {
+                    ActivityInfo.Text = "Aктивность высокого уровня (активный образ жизни вкупе с ежедневными интенсивными тренировками).";
+                }
+                else
+                {
+                    ActivityInfo.Text = "Экстремально высокая активность " +
+                        "(спортивный образ жизни, тяжелый физический труд, длительные тяжелые тренировки каждый день).";
+                }
+            }
+            catch
+            {
+                await DisplayAlert("Ошибка","Введены некорректные данные о коэффициенте активности","Ок");
             }
         }
     }
